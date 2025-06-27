@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
 from sqlalchemy.orm import Session
 from typing import List
 from pydantic import BaseModel
-
+from random import uniform
+import asyncio
 from app import schemas, models, crud
 from app.dependencies import get_current_user, get_current_admin_user
 from app.database import get_db
@@ -146,3 +147,53 @@ def unlock_delivery(
     delivery.is_locked = False
     db.commit()
     return {"message": f"Delivery {delivery_id} has been unlocked"}
+
+async def run_delivery_simulation(delivery_id: int):
+    from app.database import SessionLocal
+    db = SessionLocal()
+
+    try:
+        delivery = db.query(models.DeliveryRequest).filter(models.DeliveryRequest.id == delivery_id).first()
+        if not delivery:
+            return
+
+        # Simulated waypoints (add more if you want)
+        steps = [
+            "confirmed",
+            "out_for_delivery",
+            "delivered"
+        ]
+
+        for step in steps:
+            delivery.stage = step
+
+            # Randomly simulate small GPS drift
+            if delivery.latitude and delivery.longitude:
+                delivery.latitude += uniform(-0.0002, 0.0002)
+                delivery.longitude += uniform(-0.0002, 0.0002)
+
+            db.commit()
+            await asyncio.sleep(5)  # wait 5s between steps
+
+    finally:
+        db.close()
+
+@router.post("/simulate/{delivery_id}")
+async def simulate_delivery_tracking(
+    delivery_id: int,
+    background_tasks: BackgroundTasks,
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin_user)
+):
+    delivery = db.query(models.DeliveryRequest).filter(models.DeliveryRequest.id == delivery_id).first()
+
+    if not delivery:
+        raise HTTPException(status_code=404, detail="Delivery not found")
+
+    # Only simulate if not already delivered
+    if delivery.stage == "delivered":
+        raise HTTPException(status_code=400, detail="Already delivered")
+
+    # Start background simulation
+    background_tasks.add_task(run_delivery_simulation, delivery.id)
+    return {"message": f"Simulation started for delivery {delivery_id}"}
