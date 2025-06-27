@@ -8,6 +8,8 @@ from . import models, schemas
 from .auth import verify_password
 import requests
 from geopy.distance import geodesic
+from math import radians, sin, cos, sqrt, atan2
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -70,7 +72,20 @@ def delete_product(db: Session, product_id: int):
 # Deliveries
 
 def create_delivery_request(db: Session, user_id: int, request_data: schemas.DeliveryRequestCreate):
+    
     lat, lng = get_coordinates_from_address(request_data.address)
+    warehouse_lat = 3.866
+    warehouse_lng = 11.517
+    
+        # Step 1: Get distance
+    distance_km = haversine_distance_km(warehouse_lat, warehouse_lng, lat, lng)
+
+    # Step 2: Estimate time (assume average speed 30 km/h)
+    avg_speed_kmh = 30
+    estimated_minutes = int((distance_km / avg_speed_kmh) * 60)
+
+    # Step 3: Format as string
+    eta_string = f"{estimated_minutes} minutes"
     
     delivery = models.DeliveryRequest(
         user_id=user_id,
@@ -79,7 +94,9 @@ def create_delivery_request(db: Session, user_id: int, request_data: schemas.Del
         quantity=request_data.quantity,
         latitude=lat,
         longitude=lng,
-        status="pending"
+        status="pending",
+        estimated_delivery_time = eta_string
+
     )
     db.add(delivery)
     db.commit()
@@ -141,6 +158,23 @@ def get_coordinates_from_address(address: str):
 
 def compute_distance(p1, p2):
     return geodesic(p1, p2).kilometers
+
+def haversine_distance_km(lat1, lon1, lat2, lon2):
+    # Earth radius in km
+    R = 6371.0
+
+    lat1 = radians(lat1)
+    lon1 = radians(lon1)
+    lat2 = radians(lat2)
+    lon2 = radians(lon2)
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+
+    return R * c  # Distance in KM
 
 
 def optimize_delivery_route(deliveries, start=(4.0749865, 11.5525917)):  # HQ in Yaoundé

@@ -129,6 +129,8 @@ class DeliveryRequestOut(BaseModel):
     created_at: datetime
     latitude: Optional[float]
     longitude: Optional[float]
+    estimated_delivery_time: Optional[str]
+
 
     class Config:
         from_attributes = True

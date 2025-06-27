@@ -90,6 +90,7 @@ class DeliveryRequest(Base):
     is_locked = Column(Boolean, default=False)
     latitude = Column(Float, nullable=True)   
     longitude = Column(Float, nullable=True)
+    estimated_delivery_time = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User")
