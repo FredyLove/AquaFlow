@@ -125,6 +125,7 @@ class DeliveryRequestOut(BaseModel):
     status: DeliveryStatus
     stage: DeliveryStage 
     driver: Optional[DriverOut]
+    is_locked: bool
     created_at: datetime
     latitude: Optional[float]
     longitude: Optional[float]
@@ -132,7 +133,9 @@ class DeliveryRequestOut(BaseModel):
     class Config:
         from_attributes = True
 
-     
+class UnlockRequest(BaseModel):
+    delivery_id: int
+    
 # Reviews
 
 class ReviewBase(BaseModel):

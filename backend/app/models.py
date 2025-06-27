@@ -87,6 +87,7 @@ class DeliveryRequest(Base):
     status = Column(Enum(DeliveryStatus), default="pending")  # overall status
     stage = Column(Enum(DeliveryStage), default="confirmed")  # progress status
     driver_id = Column(Integer, ForeignKey("drivers.id"), nullable=True)
+    is_locked = Column(Boolean, default=False)
     latitude = Column(Float, nullable=True)   
     longitude = Column(Float, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)

@@ -123,8 +123,26 @@ def assign_driver_to_route(
     for delivery_id in data.delivery_ids:
         delivery = db.query(models.DeliveryRequest).filter(models.DeliveryRequest.id == delivery_id).first()
         if delivery:
+            if delivery.is_locked:
+                continue 
             delivery.driver = driver
+            delivery.is_locked = True
             db.commit()
             updated_count += 1
 
     return {"message": f"Driver assigned to {updated_count} deliveries."}
+
+
+@router.put("/{delivery_id}/unlock")
+def unlock_delivery(
+    delivery_id: int,
+    db: Session = Depends(get_db),
+    current_admin: models.User = Depends(get_current_admin_user)
+):
+    delivery = db.query(models.DeliveryRequest).filter(models.DeliveryRequest.id == delivery_id).first()
+    if not delivery:
+        raise HTTPException(status_code=404, detail="Delivery not found")
+
+    delivery.is_locked = False
+    db.commit()
+    return {"message": f"Delivery {delivery_id} has been unlocked"}
