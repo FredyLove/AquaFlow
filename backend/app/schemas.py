@@ -75,6 +75,26 @@ class ProductOut(ProductBase):
     class Config:
         orm_mode = True
 
+
+# Drivers 
+
+class DriverCreate(BaseModel):
+    name: str
+    phone: str
+    vehicle: Optional[str]
+
+class DriverOut(BaseModel):
+    id: int
+    name: str
+    phone: str
+    vehicle: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+   
+   
+   
 # Deliveries
 
 class DeliveryStatus(str, Enum):
@@ -104,16 +124,15 @@ class DeliveryRequestOut(BaseModel):
     address: str
     status: DeliveryStatus
     stage: DeliveryStage 
-    driver_name: Optional[str]
-    driver_phone: Optional[str]
-    driver_vehicle: Optional[str]
+    driver: Optional[DriverOut]
     created_at: datetime
     latitude: Optional[float]
     longitude: Optional[float]
 
     class Config:
         from_attributes = True
-        
+
+     
 # Reviews
 
 class ReviewBase(BaseModel):
