@@ -6,3 +6,4 @@ python_jose
 reportlab
 Requests
 SQLAlchemy
+uvicorn==0.34.3
