@@ -15,10 +15,15 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+origins = [
+     "http://localhost:8080",
+    "http://localhost:5173",
+    "https://aquaflow-frontend.onrender.com"
+]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # or specify ["http://localhost:5173"]
+    allow_origins=origins,  # or specify ["http://localhost:5173"]
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
