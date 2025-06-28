@@ -36,7 +36,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
+app.get("/")
+def read_root():
+    return {"message": "Welcome to AquaFlow Backend API 🚰"}
 
 @app.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
