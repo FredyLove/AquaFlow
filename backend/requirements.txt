@@ -7,3 +7,4 @@ reportlab
 Requests
 SQLAlchemy
 uvicorn==0.34.3
+email-validator>=2.0.0
