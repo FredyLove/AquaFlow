@@ -7,13 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger
-} from "@/components/ui/dialog";
-import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
 } from "@/components/ui/select";
 import {
-  Plus, Search, ShoppingCart, Calendar
+  Search, ShoppingCart, Calendar
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -45,47 +42,59 @@ const Orders = () => {
   const updateStatus = async (id, newStatus) => {
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${baseURL}/delivery/${id}/status`, {
+      const res = await fetch(`${baseURL}/delivery/${id}/status`, {
         method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ status: newStatus })
+        body: JSON.stringify({ status: newStatus }),
       });
-      toast({ title: `Status updated to ${newStatus}` });
-      fetchOrders();
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || "Failed to update status");
+      }
+
+      toast({ title: `Order status updated to ${newStatus}` });
+      await fetchOrders();
     } catch (err) {
-      toast({ title: "Error updating status" });
+      toast({ title: "Error", description: err.message });
     }
   };
 
   const updateStage = async (id) => {
     try {
       const token = localStorage.getItem("token");
-      await fetch(`${baseURL}/delivery/${id}/stage`, {
+      const res = await fetch(`${baseURL}/delivery/${id}/stage`, {
         method: "PUT",
         headers: { Authorization: `Bearer ${token}` },
       });
-      toast({ title: "Stage advanced" });
-      fetchOrders();
+
+      if (!res.ok) {
+        const error = await res.json();
+        throw new Error(error.detail || "Failed to update stage");
+      }
+
+      toast({ title: "Order stage advanced" });
+      await fetchOrders();
     } catch (err) {
-      toast({ title: "Error updating stage" });
+      toast({ title: "Error", description: err.message });
     }
   };
 
   const getStatusColor = (status) => {
     switch (status) {
-      case 'approved': return 'bg-green-100 text-green-800';
-      case 'pending': return 'bg-orange-100 text-orange-800';
-      case 'rejected': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case "approved": return "bg-green-100 text-green-800";
+      case "pending": return "bg-orange-100 text-orange-800";
+      case "rejected": return "bg-red-100 text-red-800";
+      default: return "bg-gray-100 text-gray-800";
     }
   };
 
   const filteredOrders = orders.filter(order => {
     const match = order.address?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || order.status === statusFilter;
+    const matchesStatus = statusFilter === "all" || order.status === statusFilter;
     return match && matchesStatus;
   });
 
@@ -94,7 +103,7 @@ const Orders = () => {
     return sum + (order.quantity * price);
   }, 0);
 
-  const pendingOrders = orders.filter(order => order.status === 'pending').length;
+  const pendingOrders = orders.filter(order => order.status === "pending").length;
 
   return (
     <div className="space-y-6 animate-fade-in">
