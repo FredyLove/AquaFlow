@@ -37,7 +37,7 @@ def update_delivery_status(
 
 
 # 👀 Admin views all delivery requests
-@router.get("/", response_model=List[schemas.DeliveryRequestOut])
+@router.get("/requests", response_model=List[schemas.DeliveryRequestOut])
 def get_all_delivery_requests(
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin_user)

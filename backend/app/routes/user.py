@@ -75,17 +75,26 @@ def reset_user_password(
     db.commit()
     return {"message": "Password reset successfully"}
 
+from app.dependencies import get_current_user  # ✅ Import the regular user dependency
+
+from app.dependencies import get_current_user
+
 @router.put("/{user_id}")
 def update_user_info(
     user_id: int,
     user_update: schemas.UserUpdate,
     db: Session = Depends(get_db),
-    current_admin: models.User = Depends(get_current_admin_user)
+    current_user: models.User = Depends(get_current_user)  # ✅ Regular user allowed
 ):
     user = db.query(models.User).filter(models.User.id == user_id).first()
+
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-    
+
+    # ✅ Only allow the user themselves to update their own profile
+    if current_user.id != user_id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="You are not authorized to update this profile")
+
     if user_update.username:
         user.username = user_update.username
     if user_update.email:
@@ -94,3 +103,4 @@ def update_user_info(
     db.commit()
     db.refresh(user)
     return {"message": "User updated successfully"}
+

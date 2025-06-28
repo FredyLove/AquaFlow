@@ -30,27 +30,27 @@ const menuItems = [
   },
   {
     title: "Inventory",
-    url: "admin/inventory",
+    url: "inventory",
     icon: Package,
   },
   {
     title: "Orders",
-    url: "admin/orders",
+    url: "orders",
     icon: ShoppingCart,
   },
   {
     title: "Customers",
-    url: "admin/customers",
+    url: "customers",
     icon: Users,
   },
   {
     title: "Delivery",
-    url: "admin/delivery",
+    url: "delivery",
     icon: Truck,
   },
   {
     title: "Reports",
-    url: "admin/reports",
+    url: "reports",
     icon: FileText,
   },
 ];

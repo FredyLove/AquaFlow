@@ -94,3 +94,29 @@ def delete_product(
     if not deleted:
         raise HTTPException(status_code=404, detail="Product not found")
     return deleted
+
+
+@router.get("/{product_id}/reviews")
+def get_product_reviews(product_id: int, db: Session = Depends(database.get_db)):
+    product = db.query(models.Product).filter(models.Product.id == product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+    
+    reviews = db.query(models.ProductReview).filter(models.ProductReview.product_id == product_id).all()
+
+    return {
+        "product": {
+            "id": product.id,
+            "name": product.name,
+            "description": product.description,
+        },
+        "reviews": [
+            {
+                "id": r.id,
+                "rating": r.rating,
+                "comment": r.comment,
+                "user_name": r.user.username,
+                "created_at": r.created_at,
+            } for r in reviews
+        ]
+    }

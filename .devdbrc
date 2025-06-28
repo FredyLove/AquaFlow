@@ -2,5 +2,9 @@
   {
     "type": "sqlite",
     "path": "d:\\Year 3\\Fredy's app\\AquaFlow\\backend\\eden.db"
+  },
+  {
+    "type": "sqlite",
+    "path": "d:\\Year 3\\Fredy's app\\AquaFlow\\eden.db"
   }
 ]

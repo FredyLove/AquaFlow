@@ -130,3 +130,15 @@ class Driver(Base):
     vehicle = Column(String, nullable=True)
 
     deliveries = relationship("DeliveryRequest", back_populates="driver")
+
+class CartItem(Base):
+    __tablename__ = "cart_items"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"))
+    product_id = Column(Integer, ForeignKey("products.id"))
+    quantity = Column(Integer, default=1)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    user = relationship("User", backref="cart_items")
+    product = relationship("Product")

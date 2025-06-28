@@ -6,8 +6,10 @@ from .database import engine, SessionLocal, Base
 from fastapi.security import OAuth2PasswordRequestForm
 from .auth import create_access_token
 from .schemas import Token
-from app.routes import user, product, delivery, reviews, bookmarks, notifications, messages, dashboard, driver, admin
+from app.routes import user, product, delivery, reviews, bookmarks, notifications, messages, dashboard, driver, admin, cart
 from app.database import get_db
+from fastapi.middleware.cors import CORSMiddleware
+
 
 Base.metadata.create_all(bind=engine)
 
@@ -23,6 +25,18 @@ app.include_router(messages.router)
 app.include_router(dashboard.router)
 app.include_router(driver.router)
 app.include_router(admin.router)
+app.include_router(cart.router)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # or specify ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 @app.post("/register", response_model=schemas.UserOut)
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
@@ -39,4 +53,9 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
         raise HTTPException(status_code=401, detail="Invalid email or password")
 
     access_token = create_access_token(data={"sub": user.email})
-    return {"access_token": access_token, "token_type": "bearer"}
+    return {
+        "access_token": access_token, 
+        "token_type": "bearer",
+        "role": user.role,
+        "username": user.username
+        }

@@ -34,6 +34,8 @@ class UserUpdate(BaseModel):
 class Token(BaseModel):
     access_token: str
     token_type: str
+    role: str  # ✅ Add this
+    username: str  # (optional)
 
 class TokenData(BaseModel):
     email: str | None = None
@@ -43,9 +45,7 @@ class UserLogin(BaseModel):
     password: str
 
 # Products
-
 class ProductBase(BaseModel):
-    id: int
     name: str
     description: str | None = None
     image: Optional[str] = None
@@ -55,7 +55,7 @@ class ProductBase(BaseModel):
     price: float
 
 class ProductCreate(ProductBase):
-    pass
+    quantity: int
 
 class ProductUpdate(BaseModel):
     name: str | None = None
@@ -69,6 +69,7 @@ class ProductUpdate(BaseModel):
 
 class ProductOut(ProductBase):
     id: int
+    quantity: int
     created_at: datetime
     updated_at: datetime
 
@@ -146,6 +147,8 @@ class ReviewBase(BaseModel):
 
 class ReviewCreate(ReviewBase):
     product_id: int
+    rating: int
+    comment: str
 
 class ReviewUpdate(ReviewBase):
     pass
@@ -154,6 +157,8 @@ class ReviewOut(ReviewBase):
     id: int
     user_id: int
     product_id: int
+    rating:int
+    comment: str
     created_at: datetime
     updated_at: datetime
 
@@ -214,3 +219,24 @@ class MessageOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# Cart
+
+class CartItemBase(BaseModel):
+    product_id: int
+    quantity: int = 1
+
+class CartItemCreate(CartItemBase):
+    product_id: int
+    quantity: int = 1
+
+class CartItemOut(BaseModel):
+    id: int
+    product_id: int
+    quantity: int
+    created_at: datetime
+    product: ProductOut
+
+    class Config:
+        orm_mode = True

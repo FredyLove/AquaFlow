@@ -1,5 +1,6 @@
 # app/crud.py
 from datetime import datetime
+from fastapi import HTTPException
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from sqlalchemy.exc import NoResultFound
@@ -313,3 +314,37 @@ def respond_to_message(db: Session, message_id: int, response: str):
     # Trigger notification to user
     create_notification(db, user_id=msg.user_id, message="Admin replied to your message")
     return msg
+
+# Cart
+
+def add_to_cart(db, user_id: int, item: schemas.CartItemCreate):
+    # Check if the product exists
+    product = db.query(models.Product).filter(models.Product.id == item.product_id).first()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    # Check if the user already has this product in cart
+    existing = db.query(models.CartItem).filter_by(user_id=user_id, product_id=item.product_id).first()
+    if existing:
+        existing.quantity += item.quantity
+    else:
+        new_item = models.CartItem(user_id=user_id, product_id=item.product_id, quantity=item.quantity)
+        db.add(new_item)
+
+    db.commit()
+
+
+def get_cart_items(db, user_id: int):
+    return db.query(models.CartItem).filter_by(user_id=user_id).all()
+
+
+def remove_cart_item(db, user_id: int, product_id: int):
+    item = db.query(models.CartItem).filter_by(user_id=user_id, product_id=product_id).first()
+    if item:
+        db.delete(item)
+        db.commit()
+
+
+def clear_cart(db, user_id: int):
+    db.query(models.CartItem).filter_by(user_id=user_id).delete()
+    db.commit()
