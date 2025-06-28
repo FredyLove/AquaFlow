@@ -15,6 +15,15 @@ Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:8080"],  # or specify ["http://localhost:5173"]
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 app.include_router(user.router)
 app.include_router(product.router)
 app.include_router(delivery.router)
@@ -26,15 +35,6 @@ app.include_router(dashboard.router)
 app.include_router(driver.router)
 app.include_router(admin.router)
 app.include_router(cart.router)
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8080"],  # or specify ["http://localhost:5173"]
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 app.get("/")
 def read_root():
