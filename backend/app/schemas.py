@@ -110,7 +110,7 @@ class DeliveryTrackingUpdate(BaseModel):
     driver_vehicle: Optional[str] = None
     
 class DeliveryStatusUpdate(BaseModel):
-    status: DeliveryStatus
+    status: str
 
 class DeliveryRequestCreate(BaseModel):
     product_id: int

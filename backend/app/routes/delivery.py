@@ -26,7 +26,7 @@ def request_delivery(
 @router.put("/{delivery_id}/status")
 def update_delivery_status(
     delivery_id: int,
-    status: schemas.DeliveryStatus,
+    status: schemas.DeliveryStatusUpdate,
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin_user)
 ):
