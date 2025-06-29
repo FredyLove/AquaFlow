@@ -6,7 +6,7 @@ from .database import engine, SessionLocal, Base
 from fastapi.security import OAuth2PasswordRequestForm
 from .auth import create_access_token
 from .schemas import Token
-from app.routes import user, product, delivery, reviews, bookmarks, notifications, messages, dashboard, driver, admin, cart
+from app.routes import user, product, delivery, reviews, bookmarks, notifications, messages, dashboard, driver, admin, cart, reports
 from app.database import get_db
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -40,6 +40,7 @@ app.include_router(dashboard.router)
 app.include_router(driver.router)
 app.include_router(admin.router)
 app.include_router(cart.router)
+app.include_router(reports.router)
 
 app.get("/")
 def read_root():

@@ -30,7 +30,7 @@ def update_delivery_status(
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin_user)
 ):
-    updated = crud.update_delivery_status(db, delivery_id, status.value)
+    updated = crud.update_delivery_status(db, delivery_id, status.status)
     if not updated:
         raise HTTPException(status_code=404, detail="Request not found")
     return {"message": "Status updated successfully"}
@@ -197,3 +197,29 @@ async def simulate_delivery_tracking(
     # Start background simulation
     background_tasks.add_task(run_delivery_simulation, delivery.id)
     return {"message": f"Simulation started for delivery {delivery_id}"}
+
+@router.get("/{delivery_id}/map")
+def get_delivery_location(
+    delivery_id: int,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    delivery = db.query(models.DeliveryRequest).filter(models.DeliveryRequest.id == delivery_id).first()
+    if not delivery:
+        raise HTTPException(status_code=404, detail="Delivery not found")
+
+    if delivery.user_id != current_user.id and current_user.role != "admin":
+        raise HTTPException(status_code=403, detail="Not authorized to view this delivery")
+
+    return {
+        "id": delivery.id,
+        "stage": delivery.stage,
+        "latitude": delivery.latitude,
+        "longitude": delivery.longitude,
+        "status": delivery.status,
+        "updated_at": delivery.updated_at,
+        "driver": {
+            "id": delivery.driver.id if delivery.driver else None,
+            "name": delivery.driver.name if delivery.driver else "Unassigned",
+        }
+    }

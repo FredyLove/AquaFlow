@@ -13,10 +13,15 @@ def read_profile(current_user: models.User = Depends(get_current_user)):
 # 1. Get all users
 @router.get("/", response_model=list[schemas.UserOut])
 def get_all_users(
+    role: str = None,  # ✅ allow ?role=user query param
     db: Session = Depends(get_db),
     current_admin: models.User = Depends(get_current_admin_user)
 ):
-    return db.query(models.User).all()
+    query = db.query(models.User)
+    if role:
+        query = query.filter(models.User.role == role)  # ✅ filter users by role
+    return query.all()
+
 
 # 2. Search users by email
 @router.get("/search", response_model=schemas.UserOut)

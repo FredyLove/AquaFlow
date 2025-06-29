@@ -95,6 +95,7 @@ class DeliveryRequest(Base):
 
     user = relationship("User")
     product = relationship("Product")
+    product.delivery_request = relationship("DeliveryRequest", back_populates="products")
     driver = relationship("Driver", back_populates="deliveries")
 
 class Notification(Base):

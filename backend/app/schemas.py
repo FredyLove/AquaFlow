@@ -120,7 +120,7 @@ class DeliveryRequestCreate(BaseModel):
 class DeliveryRequestOut(BaseModel):
     id: int
     user_id: int
-    product_id: int
+    product: ProductOut | None = None 
     quantity: int
     address: str
     status: DeliveryStatus
