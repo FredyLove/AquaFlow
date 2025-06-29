@@ -27,57 +27,57 @@ const CustomerLogin = () => {
   const [confirmPassword, setConfirmPassword] = useState("");
 
   const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    const form = new FormData();
-    form.append("username", loginEmail);
-    form.append("password", loginPassword);
+  const form = new FormData();
+  form.append("username", loginEmail);
+  form.append("password", loginPassword);
 
-    try {
-      console.log(baseURL)
-      const res = await fetch(`${baseURL}/login`, {
-        method: "POST",
-        body: form,
+  try {
+    const res = await fetch(`${baseURL}/login`, {
+      method: "POST",
+      body: form,
+    });
+
+    const data = await res.json();
+
+    if (res.ok) {
+      toast({
+        title: "Login Successful",
+        description: "Welcome back to AquaFlow!",
       });
 
-      const data = await res.json();
+      // ✅ Save token and full user object
+      localStorage.setItem("token", data.access_token);
+      localStorage.setItem("user", JSON.stringify(data.user)); // ✅ Properly save the user
 
-      if (res.ok) {
-        toast({ 
-          title: "Login Successful",
-          description: "Welcome back to AquaFlow!",
-        });
-
-        // Save token + role
-        localStorage.setItem("token", data.access_token);
-        localStorage.setItem("role", data.role);
-
-        // Redirect by role
-        if (data.role === "admin") {
-          navigate("/admin");
-        } else if (data.role === "user") {
-          navigate("/customer-portal");
-        } else {
-          toast({ title: "Unknown role", description: data.role });
-        }
+      // ✅ Redirect by role
+      if (data.user.role === "admin") {
+        navigate("/admin");
+      } else if (data.user.role === "user") {
+        navigate("/customer-portal");
       } else {
-        toast({ 
-          title: "Login Failed", 
-          description: data.detail || "Invalid credentials",
-          variant: "destructive",
-        });
+        toast({ title: "Unknown role", description: data.user.role });
       }
-    } catch (err) {
-      toast({ 
-        title: "Error", 
-        description: "Something went wrong. Please try again.",
+    } else {
+      toast({
+        title: "Login Failed",
+        description: data.detail || "Invalid credentials",
         variant: "destructive",
       });
     }
-
+  } catch (err) {
+    toast({
+      title: "Error",
+      description: "Something went wrong. Please try again.",
+      variant: "destructive",
+    });
+  } finally {
     setIsLoading(false);
-  };
+  }
+};
+;
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
