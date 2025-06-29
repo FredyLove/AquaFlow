@@ -42,3 +42,16 @@ def get_weekly_deliveries(db: Session = Depends(get_db), current_admin: models.U
     return [
         {"day": "Mon", "delivered": 45, "pending": 8, "delayed": 2},
     ]
+
+@router.get("/dashboard")
+def dashboard_summary(db: Session = Depends(get_db), current_admin: User = Depends(get_current_admin_user)):
+    return {
+        "totalRevenue": 24500000,
+        "activeOrders": 142,
+        "totalCustomers": 1248,
+        "deliveriesToday": 89,
+        "recentOrders": [...],
+        "deliveryStatus": [...],
+        "salesTrends": [...],
+        "alerts": [...],
+    }
