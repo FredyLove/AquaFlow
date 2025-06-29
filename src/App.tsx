@@ -18,7 +18,6 @@ import OrderTracking from "./pages/OrderTracking";
 import ProductReviewsPage from "./pages/Customer/ProductReviews"
 import NotFound from "./pages/NotFound";
 import Landing from "./pages/Landing";
-import ProtectedRoute from "./components/ProtectedRoute";
 
 const queryClient = new QueryClient();
 
