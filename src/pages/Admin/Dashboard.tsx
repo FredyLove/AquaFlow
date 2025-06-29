@@ -66,7 +66,10 @@ const Dashboard = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">XAF {stats.totalRevenue.toLocaleString()}</div>
+            <div className="text-2xl font-bold">
+              XAF {Number(stats.totalRevenue || 0).toLocaleString()}
+            </div>
+
           </CardContent>
         </Card>
 
